@@ -1,0 +1,586 @@
+<title>Konnect on Linux</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --bg:#f3f4ef;
+    --surface:#eae9e1;
+    --surface-2:#e1e0d6;
+    --border:#d5d3c6;
+    --fg:#1b2320;
+    --fg-dim:#5b6660;
+    --accent:#a85a2c;
+    --accent-fg:#fff8f1;
+    --accent-2:#3f6b5c;
+    --warn:#a83f2c;
+    --warn-bg:#f4e7e1;
+    --warn-border:#dcb7a6;
+    --info:#3f6b5c;
+    --info-bg:#e7ede9;
+    --info-border:#bfd2c8;
+    --link:#a85a2c;
+    --code-bg:#1b2320;
+    --code-fg:#e7e5db;
+    --code-accent:#e0a56f;
+    --code-dim:#8a9a92;
+    --shadow: 0 1px 2px rgba(27,35,32,.06);
+  }
+  :root:not([data-theme="light"]) {
+    @media (prefers-color-scheme: dark) {
+      --bg:#14181a;
+      --surface:#1b2124;
+      --surface-2:#222a2d;
+      --border:#2d3538;
+      --fg:#e9e7dd;
+      --fg-dim:#9aa39c;
+      --accent:#d99257;
+      --accent-fg:#1b120a;
+      --accent-2:#6fac97;
+      --warn:#e08469;
+      --warn-bg:#2a1f1c;
+      --warn-border:#4a3229;
+      --info:#6fac97;
+      --info-bg:#182420;
+      --info-border:#2d4238;
+      --link:#d99257;
+      --code-bg:#0e1113;
+      --code-fg:#e7e5db;
+      --code-accent:#e0a56f;
+      --code-dim:#7c8a83;
+      --shadow: 0 1px 3px rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181a;
+    --surface:#1b2124;
+    --surface-2:#222a2d;
+    --border:#2d3538;
+    --fg:#e9e7dd;
+    --fg-dim:#9aa39c;
+    --accent:#d99257;
+    --accent-fg:#1b120a;
+    --accent-2:#6fac97;
+    --warn:#e08469;
+    --warn-bg:#2a1f1c;
+    --warn-border:#4a3229;
+    --info:#6fac97;
+    --info-bg:#182420;
+    --info-border:#2d4238;
+    --link:#d99257;
+    --code-bg:#0e1113;
+    --code-fg:#e7e5db;
+    --code-accent:#e0a56f;
+    --code-dim:#7c8a83;
+    --shadow: 0 1px 3px rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--fg);
+    font-family:"IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .page{
+    max-width:760px;
+    margin:0 auto;
+    padding:64px 24px 120px;
+  }
+  code, .mono, pre, .chip, .pin, .eyebrow, .kbd{
+    font-family:"IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  header.top{ margin-bottom:40px; }
+  .eyebrow{
+    font-size:12.5px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--accent);
+    font-weight:600;
+    margin:0 0 14px;
+  }
+  h1{
+    font-size:2.15rem;
+    font-weight:700;
+    letter-spacing:-.01em;
+    margin:0 0 14px;
+    text-wrap:balance;
+  }
+  .dek{
+    font-size:1.06rem;
+    color:var(--fg-dim);
+    max-width:58ch;
+    margin:0;
+  }
+
+  .diagram-wrap{
+    margin:40px 0 44px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:22px 18px 18px;
+    box-shadow:var(--shadow);
+  }
+  .diagram-wrap svg{ width:100%; height:auto; display:block; }
+  .diagram-cap{
+    margin:14px 2px 0;
+    font-size:13px;
+    color:var(--fg-dim);
+    line-height:1.55;
+  }
+  .diagram-cap b{ color:var(--fg); font-weight:600; }
+
+  section.part{
+    margin-top:56px;
+    padding-top:40px;
+    border-top:1px solid var(--border);
+  }
+  section.part:first-of-type{ border-top:none; margin-top:44px; padding-top:0; }
+
+  .part-head{
+    display:flex;
+    align-items:baseline;
+    gap:14px;
+    margin-bottom:8px;
+  }
+  .part-num{
+    font-size:13px;
+    color:var(--accent);
+    font-weight:600;
+    letter-spacing:.02em;
+    white-space:nowrap;
+  }
+  h2{
+    font-size:1.32rem;
+    font-weight:700;
+    margin:0;
+    letter-spacing:-.005em;
+    text-wrap:balance;
+  }
+  h3{
+    font-size:1.02rem;
+    font-weight:600;
+    margin:26px 0 10px;
+  }
+  .part-sub{
+    color:var(--fg-dim);
+    font-size:.98rem;
+    margin:0 0 22px;
+    max-width:62ch;
+  }
+
+  ol.steps{
+    list-style:none;
+    margin:0 0 20px;
+    padding:0;
+    counter-reset:step;
+  }
+  ol.steps > li{
+    counter-increment:step;
+    position:relative;
+    padding:0 0 0 34px;
+    margin-bottom:16px;
+    line-height:1.55;
+  }
+  ol.steps > li:last-child{ margin-bottom:0; }
+  ol.steps > li::before{
+    content: counter(step);
+    position:absolute;
+    left:0;
+    top:1px;
+    width:22px;
+    height:22px;
+    border-radius:4px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    color:var(--fg-dim);
+    font-family:"IBM Plex Mono", monospace;
+    font-size:12px;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  p{ margin:0 0 14px; }
+  .part p:last-child{ margin-bottom:0; }
+
+  .pin{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:1.5px 7px;
+    font-size:.86em;
+    color:var(--fg);
+    white-space:nowrap;
+  }
+  .pin::before{
+    content:"";
+    width:5px; height:5px;
+    border-radius:50%;
+    background:var(--accent-2);
+    flex:none;
+  }
+
+  pre{
+    background:var(--code-bg);
+    color:var(--code-fg);
+    border-radius:6px;
+    padding:15px 16px;
+    overflow-x:auto;
+    font-size:13.2px;
+    line-height:1.65;
+    margin:14px 0 18px;
+    box-shadow:var(--shadow);
+  }
+  pre code{ background:none; padding:0; color:inherit; }
+  code{
+    background:var(--surface-2);
+    border:1px solid var(--border);
+    border-radius:3px;
+    padding:1.5px 5px;
+    font-size:.87em;
+  }
+  pre code .c{ color:var(--code-dim); }
+  pre code .k{ color:var(--code-accent); }
+
+  .file-label{
+    font-size:12.5px;
+    color:var(--fg-dim);
+    margin:0 0 -8px;
+    display:block;
+  }
+
+  .callout{
+    border-radius:6px;
+    padding:16px 18px;
+    margin:18px 0;
+    font-size:.96rem;
+    line-height:1.55;
+  }
+  .callout.warn{ background:var(--warn-bg); border:1px solid var(--warn-border); }
+  .callout.info{ background:var(--info-bg); border:1px solid var(--info-border); }
+  .callout-head{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    font-weight:600;
+    margin-bottom:7px;
+    font-size:.86rem;
+    letter-spacing:.03em;
+    text-transform:uppercase;
+  }
+  .callout.warn .callout-head{ color:var(--warn); }
+  .callout.info .callout-head{ color:var(--info); }
+  .callout-head .dot{ width:7px; height:7px; border-radius:50%; flex:none; }
+  .callout.warn .dot{ background:var(--warn); }
+  .callout.info .dot{ background:var(--info); }
+  .callout p:last-child{ margin-bottom:0; }
+
+  .branch{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    margin:18px 0 22px;
+  }
+  .branch-card{
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:14px 16px;
+    background:var(--surface);
+  }
+  .branch-card h4{
+    margin:0 0 8px;
+    font-size:.82rem;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    color:var(--accent);
+    font-weight:600;
+  }
+  .branch-card p{ font-size:.92rem; color:var(--fg-dim); margin:0; }
+  @media (max-width:560px){ .branch{ grid-template-columns:1fr; } }
+
+  .checklist{ list-style:none; margin:0; padding:0; }
+  .checklist li{
+    display:flex;
+    gap:11px;
+    padding:9px 0;
+    border-bottom:1px solid var(--border);
+    align-items:flex-start;
+  }
+  .checklist li:last-child{ border-bottom:none; }
+  .checklist .box{
+    width:16px; height:16px;
+    border:1.5px solid var(--fg-dim);
+    border-radius:3px;
+    margin-top:3px;
+    flex:none;
+  }
+
+  .tbl-wrap{ overflow-x:auto; margin:8px 0 0; }
+  table.trouble{ width:100%; border-collapse:collapse; font-size:.92rem; }
+  table.trouble th{
+    text-align:left;
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    color:var(--fg-dim);
+    font-weight:600;
+    padding:0 12px 10px 0;
+    border-bottom:1px solid var(--border);
+  }
+  table.trouble td{
+    padding:14px 12px 14px 0;
+    border-bottom:1px solid var(--border);
+    vertical-align:top;
+    line-height:1.5;
+  }
+  table.trouble tr:last-child td{ border-bottom:none; }
+  table.trouble td.sym{ color:var(--fg); font-weight:500; width:32%; }
+  table.trouble td.fix{ color:var(--fg-dim); }
+  table.trouble td.fix b{ color:var(--fg); font-weight:600; }
+
+  footer.end{
+    margin-top:64px;
+    padding-top:24px;
+    border-top:1px solid var(--border);
+    color:var(--fg-dim);
+    font-size:.86rem;
+  }
+  footer.end a{ color:var(--link); }
+
+  @media (max-width:520px){
+    .page{ padding:40px 18px 90px; }
+    h1{ font-size:1.7rem; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="top">
+    <p class="eyebrow">Linux · KiCad 10 · Claude Code</p>
+    <h1>Konnect on Linux</h1>
+    <p class="dek">Same bridge as the macOS setup — one Konnect binary, installed once, used by both KiCad and Claude Code. Linux adds one real fork in the road: whether KiCad came from your distro's package manager or from Flatpak. Everything below is written from Konnect's own source and KiCad's documented behavior; the exact socket path is the one thing to confirm on your machine rather than assume.</p>
+  </header>
+
+  <div class="diagram-wrap">
+    <svg viewBox="0 0 720 220" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Mono, monospace">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--fg-dim)"></path>
+        </marker>
+      </defs>
+      <style>
+        .box{ fill:var(--surface-2); stroke:var(--border); stroke-width:1; }
+        .box.accent{ stroke:var(--accent); stroke-width:1.4; }
+        .lbl{ fill:var(--fg); font-size:13px; font-weight:600; }
+        .sub{ fill:var(--fg-dim); font-size:10.5px; }
+        .edge{ stroke:var(--fg-dim); stroke-width:1.2; fill:none; marker-end:url(#arrow); }
+        .edge-lbl{ fill:var(--fg-dim); font-size:10px; }
+      </style>
+
+      <rect class="box" x="16" y="80" width="140" height="60" rx="5"></rect>
+      <text class="lbl" x="86" y="106" text-anchor="middle">Claude Code</text>
+      <text class="sub" x="86" y="122" text-anchor="middle">MCP client</text>
+
+      <rect class="box accent" x="216" y="80" width="180" height="60" rx="5"></rect>
+      <text class="lbl" x="306" y="102" text-anchor="middle">Konnect</text>
+      <text class="sub" x="306" y="117" text-anchor="middle">same binary, launched twice</text>
+      <text class="sub" x="306" y="130" text-anchor="middle">…3rdparty/plugins/…/bin/konnect</text>
+
+      <rect class="box" x="456" y="86" width="118" height="48" rx="5" stroke-dasharray="3,2"></rect>
+      <text class="lbl" x="515" y="106" text-anchor="middle" font-size="12">IPC socket</text>
+      <text class="sub" x="515" y="120" text-anchor="middle" font-size="9">/tmp/kicad/api.sock *</text>
+
+      <rect class="box" x="614" y="30" width="94" height="52" rx="5"></rect>
+      <text class="lbl" x="661" y="52" text-anchor="middle" font-size="12">KiCad</text>
+      <text class="sub" x="661" y="66" text-anchor="middle" font-size="9">IPC API server</text>
+
+      <rect class="box accent" x="614" y="128" width="94" height="60" rx="5"></rect>
+      <text class="lbl" x="661" y="150" text-anchor="middle" font-size="12">Konnect</text>
+      <text class="sub" x="661" y="164" text-anchor="middle" font-size="9">KiCad plugin</text>
+      <text class="sub" x="661" y="176" text-anchor="middle" font-size="9">Tools menu</text>
+
+      <path class="edge" d="M156,104 L212,104"></path>
+      <text class="edge-lbl" x="184" y="97" text-anchor="middle">stdio</text>
+
+      <path class="edge" d="M396,106 L452,106"></path>
+
+      <path class="edge" d="M574,100 C595,90 600,75 612,62"></path>
+      <path class="edge" d="M574,120 C595,132 600,145 612,155"></path>
+
+      <path class="edge" d="M661,82 L661,126" stroke-dasharray="2,2"></path>
+      <text class="edge-lbl" x="672" y="106" font-size="9">same app</text>
+    </svg>
+    <p class="diagram-cap"><b>One binary, two launchers.</b> KiCad's Plugin Manager installs and updates <span class="mono">bin/konnect</span>; Claude Code launches that exact file directly. * On Flatpak installs, KiCad's sandbox can put the socket somewhere Claude Code can't see — Part 2 covers this.</p>
+  </div>
+
+  <section class="part">
+    <div class="part-head"><span class="part-num">PART 1</span><h2>Install the KiCad-side plugin</h2></div>
+    <p class="part-sub">This gives KiCad a Tools menu entry and a live schematic/PCB viewer. It doesn't talk to Claude by itself.</p>
+    <ol class="steps">
+      <li>Download the Linux release from <span class="pin">github.com/mixelpixx/Konnect</span> → Releases — <code>konnect-pcm-&lt;version&gt;-linux.zip</code>.</li>
+      <li>In KiCad: <span class="pin">Tools → Plugin and Content Manager</span></li>
+      <li>Choose <b>Install from File</b> and select the zip you downloaded.</li>
+      <li>Restart KiCad so the plugin registers.</li>
+    </ol>
+    <span class="file-label">Installs to</span>
+    <pre><code>~/.local/share/kicad/10.0/3rdparty/plugins/com_github_mixelpixx_konnect/</code></pre>
+  </section>
+
+  <section class="part">
+    <div class="part-head"><span class="part-num">PART 2</span><h2>Turn on KiCad's IPC API</h2></div>
+    <p class="part-sub">KiCad's own feature — off by default, regardless of how KiCad was installed.</p>
+    <ol class="steps">
+      <li><span class="pin">Edit → Preferences → Plugins</span></li>
+      <li>Check <b>Enable KiCad API</b>.</li>
+      <li><b>Copy the exact socket address the dialog shows you</b> — don't assume it. It's usually <code>ipc:///tmp/kicad/api.sock</code> on a native package install.</li>
+      <li>Restart KiCad fully so the API server thread actually starts.</li>
+    </ol>
+    <div class="callout warn">
+      <div class="callout-head"><span class="dot"></span>If KiCad came from Flatpak</div>
+      <p>Flatpak sandboxes give KiCad its own private <code>/tmp</code>, invisible to processes on the host — including the Konnect binary Claude Code launches. The socket still gets created, just not where a host process can reach it. Two ways through:</p>
+      <p><b>Easiest:</b> use a distro package or the official <code>.deb</code>/AppImage instead of Flatpak for this integration.</p>
+      <p><b>If you need Flatpak:</b> check whether the address shown in Preferences resolves under <code>$XDG_RUNTIME_DIR</code> rather than <code>/tmp</code> — that path is usually bind-mounted into the sandbox and reachable from the host. Point <code>ipc_socket_path</code> in Part 5 at whatever address KiCad actually shows.</p>
+    </div>
+    <p>The checkbox itself is stored in:</p>
+    <pre><code><span class="c">~/.config/kicad/10.0/kicad_common.json</span>
+{
+  <span class="k">"api"</span>: { <span class="k">"enable_server"</span>: true, ... }
+}</code></pre>
+  </section>
+
+  <section class="part">
+    <div class="part-head"><span class="part-num">PART 3</span><h2>Point the plugin at the socket</h2></div>
+    <p class="part-sub">Tell the KiCad-side plugin where the API actually lives.</p>
+    <ol class="steps">
+      <li>With KiCad open: <span class="pin">Tools → External Plugins → Konnect</span></li>
+      <li>Paste the address you copied in Part 2 into <b>IPC Socket</b>.</li>
+      <li>Click <b>Save</b>.</li>
+    </ol>
+    <span class="file-label">Writes to</span>
+    <pre><code>~/.local/share/kicad/10.0/3rdparty/plugins/com_github_mixelpixx_konnect/settings.json</code></pre>
+  </section>
+
+  <section class="part">
+    <div class="part-head"><span class="part-num">PART 4</span><h2>Check the plugin binary is executable</h2></div>
+    <p class="part-sub">Claude Code launches this file directly. Some Plugin Manager installs extract zip archives without preserving the execute bit — this bit us on macOS, worth checking here too.</p>
+    <pre><code>ls -l ~/.local/share/kicad/10.0/3rdparty/plugins/com_github_mixelpixx_konnect/bin/konnect
+<span class="c"># if it doesn't already show an x in the permissions:</span>
+chmod +x ~/.local/share/kicad/10.0/3rdparty/plugins/com_github_mixelpixx_konnect/bin/konnect
+chmod +x ~/.local/share/kicad/10.0/3rdparty/plugins/com_github_mixelpixx_konnect/bin/schematic-viewer
+
+<span class="c"># confirm it runs</span>
+~/.local/share/kicad/10.0/3rdparty/plugins/com_github_mixelpixx_konnect/bin/konnect --version</code></pre>
+    <p>Worth re-checking after any Plugin Manager update to Konnect.</p>
+  </section>
+
+  <section class="part">
+    <div class="part-head"><span class="part-num">PART 5</span><h2>The config file almost everyone misses</h2></div>
+    <p class="part-sub">The settings you saved in Part 3 belong to the KiCad plugin. The binary that Claude Code runs reads its <i>own</i> config, in a different format, from a different folder — and only at startup.</p>
+    <div class="callout warn">
+      <div class="callout-head"><span class="dot"></span>This is the step that breaks silently</div>
+      <p>If Konnect's tools report the IPC socket unreachable even though it exists, this file is almost always missing, misplaced, or saved as <code>.json</code> instead of <code>.toml</code>.</p>
+    </div>
+    <span class="file-label">Create it</span>
+    <pre><code>mkdir -p ~/.config/konnect
+
+cat &gt; ~/.config/konnect/config.toml &lt;&lt;'EOF'
+<span class="k">ipc_socket_path</span> = "ipc:///tmp/kicad/api.sock"
+EOF</code></pre>
+    <p>Use the exact address you copied from KiCad's Preferences dialog in Part 2, not necessarily the one above.</p>
+
+    <h3>Native package install (apt / dnf / pacman)</h3>
+    <p>That's usually the whole file — <code>kicad-cli</code> and <code>kicad</code> are already on <code>PATH</code> at <code>/usr/bin/</code>, and Konnect falls back to the bare command names.</p>
+
+    <h3>Flatpak install</h3>
+    <p><code>kicad-cli</code> only exists inside the Flatpak sandbox — there's no plain executable path to point at directly. Wrap it in a small script and point Konnect at the script instead:</p>
+    <pre><code>cat &gt; ~/.local/bin/kicad-cli &lt;&lt;'EOF'
+#!/bin/sh
+exec flatpak run --command=kicad-cli org.kicad.KiCad "$@"
+EOF
+chmod +x ~/.local/bin/kicad-cli</code></pre>
+    <p>Then add to <code>config.toml</code>:</p>
+    <pre><code><span class="k">kicad_cli</span> = "/home/&lt;you&gt;/.local/bin/kicad-cli"</code></pre>
+
+    <p>This file is read once, at process start — any edit needs a restart to take effect. See Part 7.</p>
+  </section>
+
+  <section class="part">
+    <div class="part-head"><span class="part-num">PART 6</span><h2>Register Konnect with Claude Code</h2></div>
+    <p class="part-sub">Add an <code>mcpServers</code> entry pointing straight at the Plugin-Manager-installed binary from Part 1 — the same file KiCad itself uses.</p>
+    <span class="file-label">Global config — <code>~/.claude.json</code></span>
+    <pre><code>{
+  <span class="c">...</span>
+  <span class="k">"mcpServers"</span>: {
+    <span class="k">"konnect"</span>: {
+      <span class="k">"type"</span>: "stdio",
+      <span class="k">"command"</span>: "/home/&lt;you&gt;/.local/share/kicad/10.0/3rdparty/plugins/com_github_mixelpixx_konnect/bin/konnect",
+      <span class="k">"args"</span>: [],
+      <span class="k">"env"</span>: {}
+    }
+  }
+}</code></pre>
+    <p>Project-scoped instead of global? Put the same <code>"konnect": {…}</code> object in a <code>.mcp.json</code> at the project root.</p>
+  </section>
+
+  <section class="part">
+    <div class="part-head"><span class="part-num">PART 7</span><h2>Restart both sides and verify</h2></div>
+    <ul class="checklist">
+      <li><span class="box"></span>Fully quit and relaunch KiCad, with the project open</li>
+      <li><span class="box"></span>Restart Claude Code, so the MCP server rereads <code>config.toml</code></li>
+      <li><span class="box"></span>Ask Claude to check the KiCad connection — it should report the IPC socket reachable and list your open board</li>
+    </ul>
+  </section>
+
+  <section class="part">
+    <div class="part-head"><span class="part-num">REFERENCE</span><h2>Troubleshooting</h2></div>
+    <div class="tbl-wrap">
+      <table class="trouble">
+        <thead>
+          <tr><th>Symptom</th><th>Cause &amp; fix</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="sym">Claude Code can't launch konnect — permission denied</td>
+            <td class="fix">Execute bit missing on the Plugin-Manager copy. Redo Part 4's <code>chmod +x</code> — check again after every Konnect update.</td>
+          </tr>
+          <tr>
+            <td class="sym">Socket exists, but tools still say it's unreachable</td>
+            <td class="fix"><b>config.toml</b> missing, wrong path, or saved as <code>.json</code>. It must be TOML, at <code>~/.config/konnect/config.toml</code>. Recreate it, then restart Claude Code.</td>
+          </tr>
+          <tr>
+            <td class="sym">KiCad was installed via Flatpak and nothing connects</td>
+            <td class="fix">The socket lives inside KiCad's sandbox <code>/tmp</code>, not the host's. Check for it under <code>$XDG_RUNTIME_DIR</code> instead, or switch to a native/distro package for this integration.</td>
+          </tr>
+          <tr>
+            <td class="sym">"Board is open in the schematic editor" — but it isn't</td>
+            <td class="fix">Stale lock files from a crashed KiCad session. Quit KiCad, then look for and delete any <code>.~lock.*#</code> or <code>~*.lck</code> files in the project folder.</td>
+          </tr>
+          <tr>
+            <td class="sym">Flipping a footprint to the other side always refuses</td>
+            <td class="fix">That specific operation has no live-IPC path yet. Either close KiCad and let the tool edit the file directly, or select the part in KiCad and press <span class="kbd">F</span> yourself.</td>
+          </tr>
+          <tr>
+            <td class="sym">ERC / DRC / SVG export fail outright</td>
+            <td class="fix">On a native install, confirm with <code>which kicad-cli</code>. On Flatpak, confirm the wrapper script from Part 5 runs and is what <code>kicad_cli</code> in config.toml points to.</td>
+          </tr>
+          <tr>
+            <td class="sym">Edited config.toml, still no change</td>
+            <td class="fix">The MCP server only reads config at startup. Restart Claude Code — reopening the KiCad project alone won't do it.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="end">
+    Konnect is developed at <a href="https://github.com/mixelpixx/Konnect" target="_blank" rel="noopener">github.com/mixelpixx/Konnect</a>. Paths above are current for KiCad 10.0 and cross-checked against Konnect's source — the socket path and Flatpak behavior are the two things worth confirming against what you actually see, since they weren't verified on a live Linux machine.
+  </footer>
+
+</div>
